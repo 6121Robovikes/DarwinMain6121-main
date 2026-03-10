@@ -4,8 +4,7 @@
 
 package frc.robot.commands;
 
-//import static frc.robot.generated.ChoreoTraj.OutpostAndDepotTrajectory$0;
-//import static frc.robot.generated.ChoreoTraj.OutpostAndDepotTrajectory$1;
+import static frc.robot.generated.ChoreoTraj.meter_auto;
 
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
@@ -71,10 +70,8 @@ public final class AutoRoutines {
 
     private AutoRoutine outpostAndDepotRoutine() {
         final AutoRoutine routine = autoFactory.newRoutine("Outpost and Depot");
-        final AutoTrajectory startToOutpost = OutpostAndDepotTrajectory$0.asAutoTraj(routine);
-        final AutoTrajectory outpostToDepot = OutpostAndDepotTrajectory$1.asAutoTraj(routine);
-        final AutoTrajectory depotToShootingPose = OutpostAndDepotTrajectory$2.asAutoTraj(routine);
-        final AutoTrajectory shootingPoseToTower = OutpostAndDepotTrajectory$3.asAutoTraj(routine);
+        final AutoTrajectory startToOutpost = meter_auto.asAutoTraj(routine);
+
 
         routine.active().onTrue(
             Commands.sequence(
@@ -82,38 +79,9 @@ public final class AutoRoutines {
                 startToOutpost.cmd()
             )
         );
+        //auto commands start here
 
-        routine.observe(climber::isHomed).onTrue(
-            Commands.sequence(
-                Commands.waitSeconds(0.5),
-                intake.runOnce(() -> intake.set(Intake.Position.INTAKE))
-            )
-        );
-
-        startToOutpost.doneDelayed(1).onTrue(outpostToDepot.cmd());
-
-        outpostToDepot.atTimeBeforeEnd(1).onTrue(intake.intakeCommand());
-        outpostToDepot.doneDelayed(0.1).onTrue(depotToShootingPose.cmd());
-
-        depotToShootingPose.active().whileTrue(limelight.idle());
-        depotToShootingPose.atTime(0.5).onTrue(
-            Commands.parallel(
-                launcher.spinUpCommand(2600),
-                hood.positionCommand(0.32)
-            )
-        );
-        depotToShootingPose.done().onTrue(
-            Commands.sequence(
-                subsystemCommands.aimAndShoot()
-                    .withTimeout(5),
-                shootingPoseToTower.cmd()
-            )
-        );
-
-        shootingPoseToTower.active().whileTrue(limelight.idle());
-        shootingPoseToTower.active().onTrue(climber.positionCommand(Climber.Position.HANGING));
-        shootingPoseToTower.done().onTrue(climber.positionCommand(Climber.Position.HUNG));
-
+     
         return routine;
     }
 }
