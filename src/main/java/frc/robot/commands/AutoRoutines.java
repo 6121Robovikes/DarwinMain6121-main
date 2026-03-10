@@ -63,13 +63,13 @@ public final class AutoRoutines {
     }
 
     public void configure() {
-        autoChooser.addRoutine("Outpost and Depot", this::outpostAndDepotRoutine);
+        autoChooser.addRoutine("meter_auto", this::outpostAndDepotRoutine);
         SmartDashboard.putData("Auto Chooser", autoChooser);
         RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler());
     }
 
     private AutoRoutine outpostAndDepotRoutine() {
-        final AutoRoutine routine = autoFactory.newRoutine("Outpost and Depot");
+        final AutoRoutine routine = autoFactory.newRoutine("meter_auto");
         final AutoTrajectory startToOutpost = meter_auto.asAutoTraj(routine);
 
 
